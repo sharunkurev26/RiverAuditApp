@@ -1,0 +1,47 @@
+package com.example.riverauditapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Link the UI from your XML
+        TextView scoreText = findViewById(R.id.scoreText);
+        Button btnAnalyze = findViewById(R.id.btnAnalyze);
+
+        // Set the action for when the button is clicked
+        btnAnalyze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Show immediate feedback
+                scoreText.setText("AI is analyzing the Yamuna...");
+
+                // 2. Start the AI process
+                RiverAI ai = new RiverAI();
+
+                // 3. Use your helper method to create the data string
+                String dataToAnalyze = prepareAuditSummary(5.2, "High", 15.5);
+
+                // 4. Send that clean summary to Gemini
+                ai.askGemini(dataToAnalyze, response -> {
+                    // 5. Update the text with the AI's explanation
+                    runOnUiThread(() -> scoreText.setText(response));
+                });
+            }
+        });
+    }
+
+    // THIS MUST BE INSIDE THE CLASS BRACES
+    private String prepareAuditSummary(double ph, String ammonia, double turbidity) {
+        return String.format("River Audit Report: pH is %.1f, Ammonia levels are %s, and Turbidity is %.1f NTU.",
+                ph, ammonia, turbidity);
+    }
+} 
